@@ -3,7 +3,6 @@ const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
 
-const cookieParser = require('cookie-parser');
 const appLogger = require('./util/LogManager').getLogger('app.js');
 const serverConfig = require("../config.json");
 const security = require('./config/Security');
@@ -42,9 +41,6 @@ app.use(logger('dev'));
 //Session depended on cookie
 app.use(security.setSessionSetup());
 app.use((req, res, next)=> { security.autoLoadUserSession(req, res, next) })
-
-//Todo: xss validation
-
 
 //Setup REST api views - route handlers
 app.use("/user", userRouter);
