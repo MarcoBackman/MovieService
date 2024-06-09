@@ -83,6 +83,7 @@ function setSessionSetup() {
     });
 }
 
+
 //Todo: add csrf security
 
 module.exports = {getCorsPolicy, autoLoadUserSession, setSessionSetup};

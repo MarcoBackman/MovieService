@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const appLogger = require('./util/LogManager').getLogger('app.js');
 const serverConfig = require("../config.json");
@@ -12,7 +13,7 @@ const security = require('./config/Security');
 let userRouter = require("./controller/UserController");
 let movieRouter = require("./controller/MovieController");
 let opsRouter = require("./controller/OpsController");
-let credentialRouter = require("./config/Credentials");
+let credentialRouter = require("./controller/SecurityController");
 
 //Express setup
 const app = express();
@@ -34,6 +35,9 @@ let synchronizeData = require('./config/DBConfiguration');
     appLogger.info("Database config stage completed.");
 }))();
 
+//Signed cookie setup
+app.use(cookieParser(serverConfig.cookie.secret));
+
 //Application security setup
 app.use(cors(security.getCorsPolicy()));
 app.use(logger('dev'));
@@ -46,7 +50,7 @@ app.use((req, res, next)=> { security.autoLoadUserSession(req, res, next) })
 app.use("/user", userRouter);
 app.use("/movie", movieRouter);
 app.use("/ops", opsRouter);
-app.use("/credential", credentialRouter);
+app.use("/security", credentialRouter);
 
 // Todo: catch 404 and forward to error handler, add timeout
 app.use(function(req, res, next) {

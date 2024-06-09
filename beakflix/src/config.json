@@ -1,0 +1,7 @@
+{
+  "server": {
+    "ssl" : false,
+    "host" : "localhost",
+    "port": "8085"
+  }
+}

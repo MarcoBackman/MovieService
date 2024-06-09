@@ -207,6 +207,159 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "security - get session",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"session\" : {\r\n        \"username\" : \"test\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/getSession",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"getSession"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "security - get session logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"session\" : {\r\n        \"username\" : \"test\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/sessionLogout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"sessionLogout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "security - get cookie",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"strictSSL": false,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/getCookie",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"getCookie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "security - set cookie(guest)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\" : \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/setCookie",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"setCookie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "security - delete cookie",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\" : \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/deleteCookie",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"deleteCookie"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

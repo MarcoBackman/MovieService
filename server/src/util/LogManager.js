@@ -1,7 +1,4 @@
 const winston = require('winston');
-const path = require('path');
-const rootPath = path.resolve(__dirname);
-
 
 function getLogger(className) {
     return  winston.createLogger({
