@@ -5,13 +5,9 @@ const micromatch= require("micromatch");
 const serverConfig = require("../../config.json");
 const logger = require('../util/LogManager').getLogger('Security.js');
 
-const csrfTokens = new csrf();
-const secret = csrfTokens.secretSync();
 const sessionKey = serverConfig.session.sessionKey;
 const sessionTime = serverConfig.session.sessionTime;
 const whiteListSessionEndpoints = serverConfig.session.whiteListSession;
-
-logger.info("whiteListSessionEndpoints = " + whiteListSessionEndpoints);
 
 /**
  * CORS POLICY
@@ -42,7 +38,7 @@ function getCorsPolicy() {
 }
 
 function pathMatchesWhitelist(whitelist, path) {
-    logger.info("Whitelist endpoint that can skip session check =" + whitelist.toString());
+    logger.debug("Whitelist endpoint that can skip session check =" + whitelist.toString());
     for (const pattern of whitelist) {
         if (micromatch.isMatch(path, pattern)) {
             return true;

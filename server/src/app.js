@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const appLogger = require('./util/LogManager').getLogger('app.js');
 const serverConfig = require("../config.json");
 const security = require('./config/Security');
-
+const rateLimiter = require('./config/RateLimit');
 
 //Routers
 let userRouter = require("./controller/UserController");
@@ -45,8 +45,9 @@ app.use(logger('dev'));
 //Session depended on cookie
 app.use(security.setSessionSetup());
 app.use((req, res, next)=> { security.autoLoadUserSession(req, res, next) })
+app.use(rateLimiter);
 
-//Setup REST api views - route handlers
+//Setup REST api views - route handlers. Must declare after all security setup
 app.use("/user", userRouter);
 app.use("/movie", movieRouter);
 app.use("/ops", opsRouter);

@@ -6,11 +6,13 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
 > Make sure to run server application before running beakflix application.<br/>
 > server application serves as backend REST API server while beakflix serves as a dynamic frontend application.
 
-1. First, install MongoDB environment locally or configure setup to connect to your mongoDB host.
+1. First, install Node.jS for react application
+
+2. Second, install MongoDB environment locally or configure setup to connect to your mongoDB host.
 
    [Install mongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
 
-2. Then setup configuration file.
+3. Then setup configuration file.
     - add `config.json` file at the repository root path.
     - fill in every credentials labeled with `{}` in the following json content.
     - when you have authentication setup for mongo db set `"hasAuth" : true` otherwise `"hasAuth" : true`.
@@ -46,13 +48,13 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
    }
    ```
 
-3. Run server with following command under `.\MovieService\server\`
+4. Run server with following command under `.\MovieService\server\`
    ``` 
    npm start node ./src/app.js
     ```
    ![server-command](./img/server.png)
 
-4. Import postman collection located at `server/postman/React-BeakFlix.postman_collection.json`
+5. Import postman collection located at `server/postman/React-BeakFlix.postman_collection.json`
    
    Run postman requests or use curl
    ![postman](./img/postman.png)

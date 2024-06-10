@@ -7,6 +7,8 @@ let express = require("express");
 const serverConfig = require("../../config.json");
 let router = express.Router();
 
+const GUEST_COOKIE_NAME = 'GUEST-COOKIE';
+
 //Setup cookie -> client side
 router.post('/setCookie',
     [
@@ -28,7 +30,7 @@ router.post('/setCookie',
                 secure: serverConfig.cookie.ssl,
             }
             //Set cookie
-            res.cookie('GUEST-COOKIE', req.body.user, options);
+            res.cookie(GUEST_COOKIE_NAME, req.body.user, options);
 
             // Set session id as userID if valid
             if (req.body.user !== 'Guest') {
@@ -36,7 +38,13 @@ router.post('/setCookie',
                 req.session.username = req.body.user;
             } else {
                 console.log("Guest login, session destroyed");
-                req.session.destroy();
+                req.session.destroy(err => {
+                    if (err) {
+                        // handle error case
+                        console.error("Error on destroying session:", err);
+                    }
+                    res.clearCookie(req.session.username);
+                });
             }
             res.status(200).send({ message: "Cookie Setup Success" });
         } catch (error) {
@@ -46,11 +54,11 @@ router.post('/setCookie',
 });
 
 router.get('/getCookie', (req, res) => {
-    if (req.signedCookies['GUEST-COOKIE'] || req.cookies['GUEST-COOKIE']) {
-        console.log('Cookies: ', req.signedCookies['GUEST-COOKIE'], req.cookies['GUEST-COOKIE']);
+    if (req.signedCookies[GUEST_COOKIE_NAME] || req.cookies[GUEST_COOKIE_NAME]) {
+        console.log('Cookies: ', req.signedCookies[GUEST_COOKIE_NAME], req.cookies[GUEST_COOKIE_NAME]);
         res.status(200).json({ message: "Cookie retrieved successfully",
-            'GUEST-COOKIE': req.cookies['GUEST-COOKIE'],
-            'signed GUEST-COOKIE': req.signedCookies['GUEST-COOKIE']
+            GUEST_COOKIE_NAME: req.cookies[GUEST_COOKIE_NAME],
+            'signed GUEST-COOKIE': req.signedCookies[GUEST_COOKIE_NAME]
         });
     } else {
         console.error("No GUEST-COOKIE found");
@@ -59,8 +67,8 @@ router.get('/getCookie', (req, res) => {
 });
 
 router.delete('/deleteCookie', (req, res) => {
-    if(req.cookies['GUEST-COOKIE'] || req.signedCookies['GUEST-COOKIE']) {
-        res.clearCookie('GUEST-COOKIE', { secure: serverConfig.cookie.ssl, httpOnly: true });
+    if(req.cookies[GUEST_COOKIE_NAME] || req.signedCookies[GUEST_COOKIE_NAME]) {
+        res.clearCookie(GUEST_COOKIE_NAME, { secure: serverConfig.cookie.ssl, httpOnly: true });
         res.send("Server says : guest cookie deleted.");
         console.log("Cookie has been deleted successfully");
     } else if (req.cookies.username || req.signedCookies.username) {
@@ -86,8 +94,7 @@ router.post('/sessionLogout', (req, res) => {
 
 
 router.post('/postSession', (req, res) => {
-    console.log("Set session to user");
-    console.log(req.body.user);
+    console.log("Set session for user: " + req.body.user);
     req.session.username = req.body.user;
     res.end('done');
 });
