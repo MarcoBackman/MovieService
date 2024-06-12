@@ -45,7 +45,7 @@ app.use(logger('dev'));
 //Session depended on cookie
 app.use(security.setSessionSetup());
 app.use((req, res, next)=> { security.autoLoadUserSession(req, res, next) })
-app.use(rateLimiter);
+//app.use(rateLimiter); -- temporally disabled due to the slowness.
 
 //Setup REST api views - route handlers. Must declare after all security setup
 app.use("/user", userRouter);
@@ -55,6 +55,7 @@ app.use("/security", credentialRouter);
 
 // Todo: catch 404 and forward to error handler, add timeout
 app.use(function(req, res, next) {
+    console.error(`Request received: ${req.method} ${req.url}`);
     next(createError(404));
 });
 

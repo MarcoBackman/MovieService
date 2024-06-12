@@ -66,3 +66,5 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
 # How to setup and run (beakflix - frontend)
 
 Will be added soon.
+
+Todo: add repository layer for baekflix application.

@@ -52,16 +52,21 @@ router.post('/register', async (req, res) => {
     }
 });
 
-//get favorite movies
-router.get('/favorite/:id', async (req, res) => {
+//get favorite movies by username
+router.get('/favorite/:username', async (req, res) => {
     try {
-        const user = await UserModel.findOne({ id: req.params.id });
+        console.log(`Requested favorite movies for user with username: ${req.params.username}`);
+        const user = await UserModel.findOne({ id: req.params.username });
         if (!user) {
-            return res.json(false);
+            console.log(`User with id: ${req.params.username} not found.`);
+            return res.status(404).json(false);
         }
 
-        return res.json(user.likedMovies);
+        console.log(`Sending favorite movies for user with id: ${req.params.username}`);
+        return res.status(200).json(user.likedMovies);
+
     } catch (error) {
+        console.error(`An error occurred while fetching favorite movies : ${error}`);
         return res.status(500).json({ error: 'An error occurred while fetching favorite movies.' });
     }
 });

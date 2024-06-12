@@ -7,14 +7,21 @@ const GenreModel = require("../models/GenreModel");
 
 let router = express.Router();
 
-// example: http://{host}:{port}/movie/getMovieByID
-// req: request body - value: movieId
-router.get('/getMovieByID', async (req, res) => {
+// example: http://{host}:{port}/movie/getMovieByID/{id}
+//Accepts as path variable
+router.get('/getMovieByID/:movie', async (req, res) => {
     const ObjectId = require('mongoose').Types.ObjectId;
-    const query = {movieID: new ObjectId(req.body.movie)};
-    logger.info(req.body.movieID);
-    let result = await MovieModel.findById(req.body.movie);
-    logger.info(result);
+    let movieId = req.params.movie;
+
+    const movieObject = {movieID: new ObjectId(movieId)};
+    logger.debug("movieObject: " + movieObject.movieID);
+    logger.debug("request movie id: " + movieId);
+
+    let result = await MovieModel.findById(movieId);
+    logger.debug(result);
+    if (!result) {
+        res.json([]);
+    }
     res.json(result);
 });
 
