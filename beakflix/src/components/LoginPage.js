@@ -4,6 +4,8 @@ import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
+import {fetchAndSetUserFavorite, login} from '../repository/UserRepository';
+
 function LoginPage(props) {
 
     const navigate = useNavigate();
@@ -20,48 +22,14 @@ function LoginPage(props) {
         };
     }
 
-    //Set session when user logs in
-    function setSession(userID) {
-        axios.post('/security/postSession', {user : userID})
-            .then(resp => {
-                console.log(resp);
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }
-
     async function handleSubmit(form) {
-        await axios.post('/user/login', form)
-            .then(resp => {
-                console.log(resp);
-                if (resp.data === false) {
-                    alert("Login failed wrong ID/PW");
-                } else {
-                    //Create and set session
-                    props.setSession({
-                        login : true,
-                        status : "Sign out"
-                    });
+        await login(form, props.setSession, props.setUser);
 
-                    //Change user state
-                    props.setUser({
-                        name : form.id,
-                        favorite_list : resp.data,
-                        recent_watch_list : []
-                    });
+        await fetchAndSetUserFavorite(form.id, props.setUser);
+        console.log("User favorites: " + props.user.favorite_map.toString())
 
-                    alert("Logged in success");
-
-                    //Redirect to main
-                    navigate("/home")
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Failed request: Server Error");
-            });
-        setSession(form.id);
+        //Redirect to main
+        navigate("/home");
     }
 
     async function loginEvent(event) {

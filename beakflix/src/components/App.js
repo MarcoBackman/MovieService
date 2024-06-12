@@ -26,10 +26,7 @@ async function setCookieSession(name) {
 }
 
 function App() {
-    //Important proxy setting
-
-
-    const [user, setUser] = useState({ name: 'Guest', favorite_list: [] });
+    const [user, setUser] = useState({ name: 'Guest', favorite_map: new Map()});
     const [session, setSession] = useState({ login: false, status: "Sign In" });
     const previousLoginState = useRef(session.login);
 
@@ -53,27 +50,18 @@ function App() {
                 resetCookieConsentValue();
                 setUser({
                     name: "Guest",
-                    favorite_list: []
+                    favorite_map: new Map()
                 });
             } else {
                 setUser({
                     name: resp.data.username,
-                    favorite_list: [] //keeping it empty as you haven't fetched favorite_list yet
+                    favorite_map: new Map()
                 });
 
                 setSession({
                     login: true,
                     status: "Sign Out"
                 });
-
-                // Consider moving the axios.post call here, so it will only run when there's a successful login
-                const response = await axios.get(`/user/favorite/${resp.data.username}`);
-                if (response.data) {
-                    setUser({
-                        name: resp.data.username,
-                        favorite_list: response.data
-                    });
-                }
             }
         } catch (err) {
             console.error(err);

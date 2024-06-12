@@ -31,13 +31,11 @@ function MovieCard(props) {
     const [iconText, setIconText] = useState("Like");
     const [button, setButton] = useState(null);
     const [detailsShown, setDetailsShown] = useState(false);
-
+    let movieId = props.data._id;
     //identify favorite list on favorite change
     useEffect(() => {
-        if (props.user.favorite_list.length > 0) {
-            identifyUserFavorite();
-        }
-    }, [props.user.favorite_list]);
+        identifyUserFavorite();
+    }, [props.user.favorite_map]);
 
     //Change icon on state change
     useEffect(() => {
@@ -55,8 +53,8 @@ function MovieCard(props) {
 
     function identifyUserFavorite() {
         if (props.user.name !== "Guest") {
-            //Check userstate if someone liked the movie
-            if (props.user.favorite_list.includes(props.data)) {
+            if (props.user.favorite_map.get(movieId)) {
+                console.log("Is liked")
                 setIcon(<MdOutlineFavorite/>);
                 setButton(
                     <button type="button"  className="add_favorite" name="add_favorite" onClick={onFavClickHandler}>
@@ -77,47 +75,49 @@ function MovieCard(props) {
         }
     }
 
-    async function sync_favorite_list() {
-        try {
-            if (!props.user.name) {
-                console.warn('No user name specified')
-                return;
-            }
-
-            const resp = await axios.get(`/user/favorite/${props.user.name}`);
-
-            const favoriteList = resp.data === '' ? [] : resp.data;
-
-            props.setUser(prevState => ({
-                ...prevState,
-                name: props.user.name,
-                favorite_list: favoriteList
-            }));
-
-        } catch (err) {
-            console.error("Favorite sync failed" + err);
-        }
-    }
-
+    /**
+     * Successful response example
+     * {
+     *     "acknowledged": true,
+     *     "modifiedCount": 1,
+     *     "upsertedId": null,
+     *     "upsertedCount": 0,
+     *     "matchedCount": 1
+     * }
+     */
     async function requestAddFavorite() {
         let target = props.data._id;
         await axios.put('/user/add_favorite', {id : props.user.name, movieId: target})
             .then((resp) => {
                 console.debug(resp);
+                return resp.data.modifiedCount === 1;
             })
             .catch(err => {
                 console.error(err);
+                return false;
             });
     }
 
+    /**
+     * Successful response example
+     * {
+     *     "acknowledged": true,
+     *     "modifiedCount": 1,
+     *     "upsertedId": null,
+     *     "upsertedCount": 0,
+     *     "matchedCount": 1
+     * }
+     */
     async function requestRemoveFavorite() {
         console.log("Remove request");
         await axios.post('/user/remove_favorite', {id : props.user.name, movieId: props.data._id})
             .then((resp) => {
                 console.debug(resp);
+                return resp.data.modifiedCount === 1;
             })
             .catch(err => {
                 console.error(err);
+                return false;
             });
     }
 
@@ -127,16 +127,20 @@ function MovieCard(props) {
         //If not liked -> add to user favorite DB
         if (iconText === "Like") {
             //Add to DB first
-            await requestAddFavorite();
+            let updatedStatus = await requestAddFavorite();
             setIcon(<MdOutlineFavorite/>);
             setIconText("Unlike");
-            await sync_favorite_list();
+            if (updatedStatus) {
+                props.user.favorite_map.set(props.data._id, props.data);
+            }
         } else {
             //Remove from user favorite DB
-            await requestRemoveFavorite();
+            let updatedStatus = await requestRemoveFavorite();
             setIcon(<MdFavoriteBorder/>);
             setIconText("Like");
-            await sync_favorite_list();
+            if (updatedStatus) {
+                props.user.favorite_map.delete(props.data._id);
+            }
         }
     }
 

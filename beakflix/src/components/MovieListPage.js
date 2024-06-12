@@ -23,13 +23,13 @@ function MovieListPage(props) {
     const [genreList, setGenreList] = useState([]);
     const [listOfMoviesByCategory, setListOfMoviesByCategory] = useState([]);
     const [userCategory, setUserCategory] = useState(null);
-
+    const [loadComponent, setLoadComponent] = useState(false);
     /*
         Response body example:
             [{"_id":"666375cb36ff9f7586d2ec9b","genre":"Action","__v":0,"amount":1051},
             {"_id":"666375cb36ff9f7586d2ec9d","genre":"Crime","__v":0,"amount":828}]
      */
-    //fetch data from the server
+    //fetch data from the server once
     useEffect(() => {
         async function getGenre() {
             try {
@@ -53,15 +53,19 @@ function MovieListPage(props) {
 
     //Hook to fetch user's movies (will only visible after login)
     useEffect(() => {
-        if (props.user.favorite_list && props.user.favorite_list.length > 0) {
+        if (props.session.login === true && props.user.favorite_map.size > 0) {
             setUserCategory(() =>
                 (<Category key={'userLikes'}
                            title="My likes"
+                           session={props.session}
                            user={props.user}
                            genreList={genreList}
+                           setLoadComponent={setLoadComponent}
                 />));
+        } else {
+            setUserCategory(null);
         }
-    }, [props.user.favorite_list]);
+    }, [props.user.favorite_map, props.session.login]);
 
     //Todo: refactor hook to rerender single genre type, not all.
     //Hook to fetch list of movies by genre
@@ -70,6 +74,7 @@ function MovieListPage(props) {
             <Category
                 key={`genre-${index}`}
                 title={genre}
+                session={props.session}
                 user={props.user}
                 setUser={props.setUser}
             />

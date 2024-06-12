@@ -2,7 +2,6 @@ import '../stylesheet/Category.css';
 import axios from "axios";
 import React, {useEffect, useState} from 'react';
 import MovieCard from "./MovieCard";
-const Movie = require( "../models/MovieSchema");
 
 //This component only represents a single genre type
 function Category(props) {
@@ -24,42 +23,27 @@ function Category(props) {
 
     //Update movie card components and html components once data is changed
     useEffect(() => {
-        //Todo: when user adds favorite, reload
+        if (props.title === "My likes") {
+            setUserCards();
+        }
+    }, [props.session.login, props.user.favorite_map.size]);
 
-        //
-    }, []);
-
-    /**
-     * @param movieID
-     * @returns {Promise<Movie>}
-     */
-    async function getMovieByLiked (movieID) {
-        return await axios.get(`/movie/getMovieByID/${movieID}`)
-            .then(async (resp) => {
-                if (resp.data !== null) {
-                    return resp.data;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                return [];
-            });
-    }
-
-    async function createUserMovieCardComponent(key, movieData) {
+    function createUserMovieCardComponent(key, movieData) {
         return <MovieCard key={key} data={movieData} user={props.user} setUser={props.setUser}/>;
     }
 
-    async function setUserCards() {
-        let userFavoriteMovieList = props.user.favorite_list;
+    function setUserCards() {
+        let userFavoriteMovieMap = props.user.favorite_map;
+
+        console.log(props.user.favorite_map.size);
 
         let favComponentList = [];
-        for (let i = 0; i < userFavoriteMovieList.length; i++) {
-            let movieData = await getMovieByLiked(userFavoriteMovieList[i]);
-            let userCardComponent = await createUserMovieCardComponent(i, movieData);
+        Array.from(userFavoriteMovieMap).map(([movieId, movieData], i) => {
+            let userCardComponent = createUserMovieCardComponent(i, movieData);
             favComponentList.push(userCardComponent);
-        }
+        })
         setUserMovieComponents(favComponentList);
+        console.log(userMovieComponents);
     }
 
 

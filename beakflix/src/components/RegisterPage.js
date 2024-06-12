@@ -66,7 +66,6 @@ function RegisterPage(props) {
         //Post
         await axios.post('/user/register', form)
             .then(resp => {
-                console.log(resp);
                 if (resp.data === false) {
                     alert("Please choose different ID");
                 } else {

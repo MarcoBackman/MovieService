@@ -33,13 +33,13 @@ function NavigationBar(props) {
             });
     }
 
-    function clickEventHandler(event) {
-        if (props.session.status === "Sign In") {
+    async function clickEventHandler(event) {
+        if (props.session.login === false) {
             navigate("/login");
         } else {
 
-            deleteCookieSession();
-            sessionLogOut();
+            await deleteCookieSession();
+            await sessionLogOut();
 
             props.setSession({
                 login : false,
@@ -48,7 +48,7 @@ function NavigationBar(props) {
 
             props.setUser({
                 name : 'Guest',
-                favorite_list : [],
+                favorite_map : new Map(),
             });
 
             navigate("/home");

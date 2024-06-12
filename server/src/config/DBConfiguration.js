@@ -57,8 +57,6 @@ async function initializeMovieModel (singleMovie) {
     //If local data does not exist in DB
     if (res == null) {
         await createMovieModel(singleMovie);
-        //Set genre
-        console.log(singleMovie.info.genres);
 
         //Genre may not be defined
         if (typeof singleMovie.info.genres === 'undefined') {
@@ -67,7 +65,6 @@ async function initializeMovieModel (singleMovie) {
 
         let genreList = singleMovie.info.genres;
         for (let i = 0; i < genreList.length; i++) {
-            console.log("Updating genre: " + genreList[i]);
             await updateOrCreateGenreModel(genreList[i]);
         }
     }
