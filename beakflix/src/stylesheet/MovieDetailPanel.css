@@ -1,0 +1,100 @@
+div.movie-detail-panel {
+    display: flex;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #525252;
+    height: 200vh;
+    width: 1000px;
+    max-height: 600px;
+    border-radius: 2em;
+    padding-right: 2em;
+    overflow: hidden;
+}
+
+div.movie-detail-panel > img {
+    border-radius: 2em 0 0 2em;
+    padding-right: 3em;
+}
+
+div.detail_description_section {
+    display: block;
+    width: 100%;
+}
+
+div.movie_title_detail {
+    display: block;
+    text-align: center;
+    font-family: "Arial Black";
+    width: inherit;
+}
+
+div.movie_title_detail > p {
+    text-align: center;
+    word-wrap: break-word;
+}
+
+p.rating-detail {
+    display: block;
+    width: 100%;
+}
+
+.overlay {
+    position: fixed; /* Positions the overlay relative to the browser window */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.74); /* Black background with 50% opacity */
+    z-index: 11; /* Compared to other elements, it should be below div.movie-detail-panel */
+    display: none; /* Hide it by default */
+}
+.movie-detail-panel {
+    position: relative;
+    z-index: 1000; /* ensure the movie detail panel appears above the overlay */
+}
+
+button.close_button {
+    display: block;
+    position: absolute;
+    top: 2em;
+    right: 2em;
+    width: 20px;
+    height: 10px;
+    padding-bottom: 20px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+}
+
+ button.close_button::before,
+ button.close_button::after {
+     content: '';
+     position: absolute;
+     height: 22px;
+     width: 3px;
+     background-color: black;
+ }
+
+button.close_button::before {
+    transform: rotate(45deg);
+}
+
+button.close_button::after {
+    transform: rotate(-45deg);
+}
+
+button.close_button:hover::after,
+button.close_button:hover::before{
+    background-color: #ffffff;
+}
+
+.star {
+    font-size: 20px;
+    color: gray;
+}
+
+.star.checked {
+    color: orange;
+}

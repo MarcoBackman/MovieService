@@ -1,0 +1,36 @@
+article.movieCard {
+    display: inline-block;
+    max-height: 550px;
+    min-height: 550px;
+    max-width: 250px;
+    min-width: 250px;
+    margin: 0 0.5em 2em 0.5em;
+    background-color: black;
+    border-radius: 10px;
+    color: white;
+}
+
+div.movie_title p {
+    inline-size: 250px;
+    font-size: 16px;
+    white-space: pre-line;
+    height: 32px;
+    max-height: 32px;
+}
+
+article.movieCard > p {
+    display: block;
+    height: auto;
+    width: 250px;
+    text-align: left;
+    inline-size: 250px;
+    padding-left: 1em;
+}
+
+img.movie_img {
+    border-radius: 10px 10px 0 0;
+    max-width: 250px;
+    min-width: 250px;
+    max-height: 350px;
+    min-height: 350px;
+}

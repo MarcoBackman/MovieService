@@ -1,0 +1,16 @@
+div#register_form {
+    height: 40%;
+}
+
+button#submit_register_btn {
+
+}
+
+button#submit_register_btn label {
+    display: block;
+    margin-top: 3em;
+}
+
+div.button_section button#submit_register_btn ~ label {
+    display: block;
+}
