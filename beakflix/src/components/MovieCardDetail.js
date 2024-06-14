@@ -39,13 +39,15 @@ function MovieCardDetail(props) {
             <button type="button" className="close_button" name="close_detail"
                     onClick={closeDetailWindow}>
             </button>
-            <img className="movie_img_detail"
-                 src={props.data.image_url.replace("http", "https")}
-                 onError={(e) => {
-                     e.target.onerror = null;
-                     e.target.src = './movie.jpg'
-                 }} alt={""}>
-            </img>
+            <div className="image-section">
+                <img className="movie_img_detail"
+                     src={props.data.image_url.replace("http", "https")}
+                     onError={(e) => {
+                         e.target.onerror = null;
+                         e.target.src = './movie.jpg'
+                     }} alt={""}>
+                </img>
+            </div>
             <div className="detail_description_section">
                 <div className="movie_title_detail" style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                     <p style={{

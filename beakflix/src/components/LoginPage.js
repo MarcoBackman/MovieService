@@ -1,16 +1,20 @@
-import '../stylesheet/LoginPage.css';
-
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
 
-import {fetchAndSetUserFavorite, login} from '../repository/UserRepository';
+// Application Specific Imports
+import {login, fetchAndSetUserFavorite} from '../service/UserService';
+import UserContext from "../context/UserContext";
+import SessionContext from "../context/SessionContext";
+
+//Styles
+import '../stylesheet/LoginPage.css';
 
 function LoginPage(props) {
 
     const navigate = useNavigate();
-
     const [saveStatus, setSaveStatus] = useState("User Login");
+    const {user, setUser} = useContext(UserContext);
+    const {session, setSession} = useContext(SessionContext);
 
     async function getLoginsOnForm() {
         let id = document.querySelector("#id_input").value;
@@ -23,10 +27,8 @@ function LoginPage(props) {
     }
 
     async function handleSubmit(form) {
-        await login(form, props.setSession, props.setUser);
-
-        await fetchAndSetUserFavorite(form.id, props.setUser);
-        console.log("User favorites: " + props.user.favorite_map.toString())
+        await login(form, setSession, setUser);
+        await fetchAndSetUserFavorite(form.id, setUser);
 
         //Redirect to main
         navigate("/home");

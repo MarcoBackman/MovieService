@@ -2,8 +2,10 @@ let express = require("express");
 
 const UserModel = require("../models/UserModel");
 const security = require("../config/Security");
+const {getLogger} = require("../util/LogManager");
 
 let router = express.Router();
+let logger = getLogger('UserController.js');
 
 // example: http://{host}:{port}/user/login
 //Login
@@ -20,7 +22,7 @@ router.post('/login', async (req, res) => {
             return res.json(false);
         }
 
-        req.session.username = user;
+        req.session.sessionData = user;
         return res.json(true);
     } catch (error) {
         return res.status(500).json({ error: 'An error occurred while logging in.' });
@@ -84,15 +86,18 @@ router.put('/add_favorite',
         res.json(result);
 });
 
-//add one favorite movie
+//remove a favorite movie
 router.delete('/remove_favorite', async (req, res) => {
-
     //There can be only one unique id
-    let result = await UserModel.updateOne({ id: req.body.id }, {
-        $pull: {
-            likedMovies: req.body.movieId,
+    logger.info("user: " +  req.body.id + " requested to delete favorite: " + req.body.movieId);
+    let result = await UserModel.updateOne({ id: req.body.id }, { // use req.body.id here
+            $pull: {
+                likedMovies: req.body.movieId,
+            },
         },
-    });
+        { new: true }, // return the updated document
+    );
+    logger.info(result);
     res.json(result);
 });
 

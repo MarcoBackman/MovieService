@@ -1,10 +1,13 @@
-import '../stylesheet/RegisterPage.css';
-
 import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import axios from 'axios';
 
-function RegisterPage(props) {
+// Application Specific Imports
+import {registerUser} from "../service/UserService";
+
+//Styles
+import '../stylesheet/RegisterPage.css';
+
+function RegisterPage() {
 
     const navigate = useNavigate();
 
@@ -62,22 +65,6 @@ function RegisterPage(props) {
         setAllowSubmit(true);
     }
 
-    async function handleSubmit(form) {
-        //Post
-        await axios.post('/user/register', form)
-            .then(resp => {
-                if (resp.data === false) {
-                    alert("Please choose different ID");
-                } else {
-                    alert("User registered");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Failed request: Server Error");
-            });
-    }
-
     async function registerEvent(event) {
         event.preventDefault();
 
@@ -96,7 +83,7 @@ function RegisterPage(props) {
         }
 
         let form = await getRegisterJsonForm();
-        await handleSubmit(form);
+        await registerUser(form);
 
         setSaveStatus("Register");
     }
@@ -106,13 +93,11 @@ function RegisterPage(props) {
         let email = document.querySelector("#email_input_register").value;
         let pw = document.querySelector("#pw_input_register").value;
 
-        let newRegister = {
+        return {
             'id': id,
             'email': email,
             'pw': pw,
         };
-
-        return newRegister;
     }
 
     return (

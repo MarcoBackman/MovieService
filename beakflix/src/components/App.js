@@ -3,27 +3,16 @@ import CookieConsent, { resetCookieConsentValue } from 'react-cookie-consent';
 import React, {useState, useEffect, useRef} from 'react';
 
 // Application Specific Imports
-import UserContext from './UserContext';
+import UserContext from '../context/UserContext';
+import SessionContext from '../context/SessionContext'
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import MovieListPage from './MovieListPage';
-import axios from 'axios';
+import {getSession, setCookieSession} from '../service/SessionService';
+import {fetchAndSetUserFavorite} from '../service/UserService';
 
 // Styles
 import '../stylesheet/App.css';
-
-async function setCookieSession(name) {
-    const form = {
-        "user": name,
-    };
-
-    try {
-        const resp = await axios.post('/security/setCookie', form);
-        console.log("Cookie response: ", resp);
-    } catch (err) {
-        console.error("Cookie request Error: ", err);
-    }
-}
 
 function App() {
     const [user, setUser] = useState({ name: 'Guest', favorite_map: new Map()});
@@ -31,7 +20,8 @@ function App() {
     const previousLoginState = useRef(session.login);
 
     useEffect(() => {
-        initializeWebPage().then(() => console.log("Initialization for hook completed."));
+        initializeWebPage()
+            .then(() => console.log("Initialization for hook in App.js completed."));
     }, []);
 
     useEffect(() => {
@@ -43,50 +33,55 @@ function App() {
 
     // If session is still valid, do not logout the user
     async function initializeWebPage() {
-        try {
-            const resp = await axios.get('/security/getSession');
+        let resp = await getSession();
+        //When session is over
+        //Todo: change this to interact with session data.
+        if (previousLoginState.current === false) {
+            console.log("Session expired. Resetting attributes to default.")
+            resetCookieConsentValue();
+            setSession({
+                login : false,
+                status : "Sign In"
+            });
 
-            if (!resp.data || !resp.data.username) {
-                resetCookieConsentValue();
-                setUser({
-                    name: "Guest",
-                    favorite_map: new Map()
-                });
-            } else {
-                setUser({
-                    name: resp.data.username,
-                    favorite_map: new Map()
-                });
+            setUser({
+                name : 'Guest',
+                favorite_map : new Map(),
+            });
+        } else { //When session is still valid - load context data
+            //Todo: Make sure that server side session returns user data.
+            console.log("Session Data", resp.data, user.name);
 
-                setSession({
-                    login: true,
-                    status: "Sign Out"
-                });
-            }
-        } catch (err) {
-            console.error(err);
+            user.favorite_map = fetchAndSetUserFavorite(user.name, setUser);
+
+            setSession({
+                login: true,
+                status: "Sign Out"
+            });
         }
     }
 
     return (
         <div className="App">
-            <UserContext.Provider value={user}>
-                <Router>
-                    <Routes>
-                        <Route path="*" element={ <MovieListPage user={user} setUser={setUser} session={session} setSession={setSession} /> } />
-                        <Route path="/home" element={ <MovieListPage user={user} setUser={setUser} session={session} setSession={setSession} /> }/>
-                        <Route path="/login" element={ <LoginPage user={user} setUser={setUser} session={session} setSession={setSession} /> }/>
-                        <Route path="/register" element={ <RegisterPage /> }/>
-                    </Routes>
-                </Router>
-                <CookieConsent
-                    onAccept={() => { setCookieSession(user.name); }}
-                    onDecline={() => { alert("Cookie Declined"); }}
-                    enableDeclineButton
-                >
-                    This website uses cookies to enhance the user experience.
-                </CookieConsent>
-            </UserContext.Provider>
+            <SessionContext.Provider value={{session, setSession}}>
+                <UserContext.Provider value={{user, setUser}}>
+                    <Router>
+                        <Routes>
+                            <Route path="*" element={ <MovieListPage/> } />
+                            <Route path="/home" element={ <MovieListPage /> }/>
+                            <Route path="/login" element={ <LoginPage /> }/>
+                            <Route path="/register" element={ <RegisterPage /> }/>
+                        </Routes>
+                    </Router>
+                    <CookieConsent
+                        onAccept={() => { setCookieSession(user.name); }}
+                        onDecline={() => { alert("Cookie Declined"); }} //Todo: use local session storage, or JWT
+                        enableDeclineButton
+                    >
+                        This website uses cookies to enhance the user experience.
+                    </CookieConsent>
+                </UserContext.Provider>
+            </SessionContext.Provider>
         </div>
     );
 }

@@ -1,60 +1,47 @@
-import '../stylesheet/Category.css';
-import axios from "axios";
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+
+// Application Specific Imports
 import MovieCard from "./MovieCard";
+import {getMoviesByGenre} from '../service/MovieService';
+import UserContext from "../context/UserContext";
+import SessionContext from "../context/SessionContext";
+
+// Styles
+import '../stylesheet/Category.css';
 
 //This component only represents a single genre type
 function Category(props) {
-    //Movie React component into list where user added as favorite. Only visible after login
-    const [userMovieComponents, setUserMovieComponents] = useState([]);
+    const {user, setUser} = useContext(UserContext);
+    const {session, setSession} = useContext(SessionContext);
 
     //Stores React component into list for top 10 movies for normal case
     const [movieCardList, setMovieCardList] = useState([]);
-
-    //Update movie data and html components on load.
-    useEffect(() => {
-        //If the category is for user favorite section, add this.s
-        if (props.title === "My likes") {
-            setUserCards();
-        } else { //Regular cases like genre lists
-            setMoviesByGenreType();
-        }
-    }, []);
+    const [userMovieCardList, setUserMovieCardList] = useState([]);
+    const [favoriteMapSize, setFavoriteMapSize] = useState(user.favorite_map.size);
 
     //Update movie card components and html components once data is changed
     useEffect(() => {
-        if (props.title === "My likes") {
-            setUserCards();
-        }
-    }, [props.session.login, props.user.favorite_map.size]);
+        const isUserCategoryCheck = user.favorite_map.size > 0;
 
-    function createUserMovieCardComponent(key, movieData) {
-        return <MovieCard key={key} data={movieData} user={props.user} setUser={props.setUser}/>;
-    }
-
-    function setUserCards() {
-        let userFavoriteMovieMap = props.user.favorite_map;
-
-        console.log(props.user.favorite_map.size);
-
-        let favComponentList = [];
-        Array.from(userFavoriteMovieMap).map(([movieId, movieData], i) => {
-            let userCardComponent = createUserMovieCardComponent(i, movieData);
-            favComponentList.push(userCardComponent);
-        })
-        setUserMovieComponents(favComponentList);
-        console.log(userMovieComponents);
-    }
-
-
-    async function createMovieCardComponents(movieDataList) {
-        let cardList = [];
-        for (let i = 0; i < movieDataList.length; i++) {
-            if (movieDataList[i]) {
-                cardList.push(<MovieCard key={i} data={movieDataList[i]} user={props.user}/>);
+        if (isUserCategory() === false) {
+            setMoviesByGenreType().then(value => () => {
+                console.log("Genre " + props.title + " category initialized");
+            });
+        } else {
+            if (isUserCategoryCheck > 0) {
+                setUserMovieCardComponent();
+            } else {
+                setUserMovieCardList(null);
             }
         }
-        return cardList;
+    }, [favoriteMapSize, isUserCategory]);
+
+    function isUserCategory() {
+        return props.title === "My likes" && session.login === true;
+    }
+
+    function createMovieCardComponent(key, movieData) {
+        return <MovieCard key={key} data={movieData} favoriteMapSize={favoriteMapSize} setFavoriteMapSize={setFavoriteMapSize}/>;
     }
 
     /**
@@ -62,22 +49,32 @@ function Category(props) {
      * @returns {Promise<void>}
      */
     async function setMoviesByGenreType() {
-        const form = {
-            genre: props.title,
-        };
-
         try {
             // Get Top 10 from each Genres by descending rate order
-            const resp = await axios.get('/movie/getMoviesByGenre', { params : form});
+            const resp = await getMoviesByGenre(props.title);
 
             //Store data and crete cards
             let movieDataList = resp.data;
             if (movieDataList) {
-                let createdCards = await createMovieCardComponents(movieDataList);
+                let createdCards = [];
+                movieDataList.forEach((movieData, index) => {
+                    createdCards.push(createMovieCardComponent(index, movieData));
+                });
                 setMovieCardList(createdCards);
             }
         } catch (err) {
-            console.error('Error while setMoviesByGenreType:', err);        }
+            console.error('Error while setMoviesByGenreType:', err);
+        }
+    }
+
+    function setUserMovieCardComponent() {
+        if (isUserCategory()) {
+            let tempUserCompArr = [];
+            Array.from(user.favorite_map.keys()).map((key, index) => {
+                tempUserCompArr.push(createMovieCardComponent(index, user.favorite_map.get(key)));
+            });
+            setUserMovieCardList(tempUserCompArr);
+        }
     }
 
     return (
@@ -86,7 +83,7 @@ function Category(props) {
             <div className="scroll_panel">
                 <div className="card_field">
                     {/* Either one will be empty below */}
-                    {userMovieComponents}
+                    {userMovieCardList}
                     {movieCardList}
                 </div>
             </div>

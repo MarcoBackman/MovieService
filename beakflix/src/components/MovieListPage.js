@@ -1,29 +1,30 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import axios from "axios";
+import React, {useContext, useEffect, useState} from 'react';
 
 // Application Specific Imports
 import NavigationBar from "./NavigationBar";
 import Category from "./Category";
+import {getGenreTypes} from '../service/MovieService';
+import UserContext from "../context/UserContext";
+import SessionContext from "../context/SessionContext";
 
 // Styles
 import '../stylesheet/MovieListPage.css';
 
-
-
 /**
  * Two category sections will be visible when user is logged
  * Otherwise only one category section will be visible
- * @param props
  * @returns {Element}
  * @constructor
  */
-function MovieListPage(props) {
+function MovieListPage() {
 
     //Key - array of genre(in alphabetical order) | Value - array[movie set(rate in ascending order)]
     const [genreList, setGenreList] = useState([]);
     const [listOfMoviesByCategory, setListOfMoviesByCategory] = useState([]);
     const [userCategory, setUserCategory] = useState(null);
-    const [loadComponent, setLoadComponent] = useState(false);
+    const {user} = useContext(UserContext);
+    const {session} = useContext(SessionContext);
+
     /*
         Response body example:
             [{"_id":"666375cb36ff9f7586d2ec9b","genre":"Action","__v":0,"amount":1051},
@@ -33,7 +34,7 @@ function MovieListPage(props) {
     useEffect(() => {
         async function getGenre() {
             try {
-                const resp = await axios.get('/movie/getGenreTypes');
+                const resp = await getGenreTypes();
                 if (resp.data !== null) {
                     let data = [];
                     for (let i = 0; i < resp.data.length; i++) {
@@ -53,19 +54,16 @@ function MovieListPage(props) {
 
     //Hook to fetch user's movies (will only visible after login)
     useEffect(() => {
-        if (props.session.login === true && props.user.favorite_map.size > 0) {
+        if (session.login === true && user.favorite_map.size > 0) {
             setUserCategory(() =>
                 (<Category key={'userLikes'}
                            title="My likes"
-                           session={props.session}
-                           user={props.user}
                            genreList={genreList}
-                           setLoadComponent={setLoadComponent}
                 />));
         } else {
             setUserCategory(null);
         }
-    }, [props.user.favorite_map, props.session.login]);
+    }, [session.login, user.favorite_map.size]);
 
     //Todo: refactor hook to rerender single genre type, not all.
     //Hook to fetch list of movies by genre
@@ -74,20 +72,17 @@ function MovieListPage(props) {
             <Category
                 key={`genre-${index}`}
                 title={genre}
-                session={props.session}
-                user={props.user}
-                setUser={props.setUser}
             />
         ));
 
         // Update the state to the new list
         setListOfMoviesByCategory(newListOfMoviesByCategory);
 
-    }, [genreList, props.user, props.setUser]);
+    }, [genreList, user]);
 
     return (
         <article id="register_page">
-            <NavigationBar user={props.user} setUser={props.setUser} session={props.session} setSession={props.setSession}/>
+            <NavigationBar/>
             <div id="category_holder">
                 {userCategory}
                 {listOfMoviesByCategory}

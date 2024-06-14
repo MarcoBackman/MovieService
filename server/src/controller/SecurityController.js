@@ -12,7 +12,6 @@ const GUEST_COOKIE_NAME = 'GUEST-COOKIE';
 //Setup cookie -> client side
 router.post('/setCookie',
     [
-        // username must be an email
         check('user').isLength({ min: 1 }).escape().trim()
     ],
     async (req, res) => {
@@ -43,7 +42,7 @@ router.post('/setCookie',
                         // handle error case
                         console.error("Error on destroying session:", err);
                     }
-                    res.clearCookie(req.session.username);
+                    res.clearCookie(req.session.sessionData.id);
                 });
             }
             res.status(200).send({ message: "Cookie Setup Success" });
@@ -96,18 +95,28 @@ router.post('/sessionLogout', (req, res) => {
 router.post('/postSession', (req, res) => {
     console.log("Set session for user: " + req.body.user);
     req.session.username = req.body.user;
+
+    //Todo: Set session data from in memory storage server by sessionId
+
     res.end('done');
 });
 
 //Setup session based on the cookie -> serverside only
 router.get('/getSession', (req, res) => {
     console.log("Session info: ");
-    console.log(req.session);
+    console.log(req.session.id);
 
-    if(req.session.id === undefined){
-        console.log("Username not present in session");
+    //Todo: fetch session data by sessionId from in memory storage
+
+    if (!req.session.id) { // Check if session or session.id doesn't exist
+        console.log("Session is expired or not set");
+        res.send({ isLoggedIn: false }); //Explicitly send that the user isn't logged in
     } else {
-        res.send(req.session);
+        // Send the data the client needs
+        res.send({
+            isLoggedIn: true,
+            sessionId: req.session.id
+        });
     }
 });
 

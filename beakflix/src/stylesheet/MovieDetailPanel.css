@@ -13,9 +13,19 @@ div.movie-detail-panel {
     overflow: hidden;
 }
 
-div.movie-detail-panel > img {
+div.image-section {
     border-radius: 2em 0 0 2em;
-    padding-right: 3em;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.image-section > img {
+    width: fit-content;
+    object-fit: contain;
+    height: auto;
+    margin: auto 0;
 }
 
 div.detail_description_section {

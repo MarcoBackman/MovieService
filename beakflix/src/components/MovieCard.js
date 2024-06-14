@@ -1,10 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import MovieCardDetail from './MovieCardDetail';
-import axios from "axios";
-
-import '../stylesheet/MovieCard.css';
-import { MdOutlineFavorite, MdFavoriteBorder } from 'react-icons/md';
+import React, {useContext, useEffect, useState} from 'react';
 import { GrView } from 'react-icons/gr';
+import { MdOutlineFavorite, MdFavoriteBorder } from 'react-icons/md';
+
+
+// Application Specific Imports
+import MovieCardDetail from './MovieCardDetail';
+import {requestAddFavorite, requestRemoveFavorite} from '../service/UserService';
+import UserContext from "../context/UserContext";
+import SessionContext from "../context/SessionContext";
+
+//Styles
+import '../stylesheet/MovieCard.css';
 
 function convertTime(duration) {
     let time_string = ""
@@ -27,19 +33,27 @@ function convertTime(duration) {
 }
 
 function MovieCard(props) {
+    const {user} = useContext(UserContext);
+    const {session} = useContext(SessionContext);
+
     const [icon, setIcon] = useState(<MdFavoriteBorder/>);
     const [iconText, setIconText] = useState("Like");
     const [button, setButton] = useState(null);
     const [detailsShown, setDetailsShown] = useState(false);
+    const [action, setAction] = useState(null);
+
+    let setFavoriteMapSize = props.setFavoriteMapSize;
+    let favoriteMapSize = props.favoriteMapSize;
     let movieId = props.data._id;
+
     //identify favorite list on favorite change
-    useEffect(() => {
+    useEffect(() =>  {
         identifyUserFavorite();
-    }, [props.user.favorite_map]);
+    }, [session.login, setIcon, icon, action, favoriteMapSize]);
 
     //Change icon on state change
     useEffect(() => {
-        if (props.user.name === "Guest") {
+        if (user.name === "Guest") {
             setButton(null);
         } else {
             setButton(
@@ -48,25 +62,31 @@ function MovieCard(props) {
                 </button>
             );
         }
-    },  [props.user.name] );
+    },  [session.login] );
 
 
     function identifyUserFavorite() {
-        if (props.user.name !== "Guest") {
-            if (props.user.favorite_map.get(movieId)) {
-                console.log("Is liked")
+        if (user.name !== "Guest") {
+            //user.favorite_map is a promise
+            const isFavoriteMovie = user.favorite_map.get(movieId);
+            if (isFavoriteMovie) {
                 setIcon(<MdOutlineFavorite/>);
+                setIconText("Unlike");
                 setButton(
                     <button type="button"  className="add_favorite" name="add_favorite" onClick={onFavClickHandler}>
                         {icon} {iconText}
                     </button>
                 );
+                setAction("like")
             } else {
+                setIcon(<MdFavoriteBorder/>);
+                setIconText("Like");
                 setButton(
                     <button type="button"  className="add_favorite" name="add_favorite" onClick={onFavClickHandler}>
                         {icon} {iconText}
                     </button>
                 );
+                setAction("unlike")
             }
         } else {
             setButton(
@@ -75,72 +95,34 @@ function MovieCard(props) {
         }
     }
 
-    /**
-     * Successful response example
-     * {
-     *     "acknowledged": true,
-     *     "modifiedCount": 1,
-     *     "upsertedId": null,
-     *     "upsertedCount": 0,
-     *     "matchedCount": 1
-     * }
-     */
-    async function requestAddFavorite() {
-        let target = props.data._id;
-        await axios.put('/user/add_favorite', {id : props.user.name, movieId: target})
-            .then((resp) => {
-                console.debug(resp);
-                return resp.data.modifiedCount === 1;
-            })
-            .catch(err => {
-                console.error(err);
-                return false;
-            });
-    }
-
-    /**
-     * Successful response example
-     * {
-     *     "acknowledged": true,
-     *     "modifiedCount": 1,
-     *     "upsertedId": null,
-     *     "upsertedCount": 0,
-     *     "matchedCount": 1
-     * }
-     */
-    async function requestRemoveFavorite() {
-        console.log("Remove request");
-        await axios.post('/user/remove_favorite', {id : props.user.name, movieId: props.data._id})
-            .then((resp) => {
-                console.debug(resp);
-                return resp.data.modifiedCount === 1;
-            })
-            .catch(err => {
-                console.error(err);
-                return false;
-            });
-    }
-
     //change icon and statement on fav button click
     async function onFavClickHandler(e) {
         e.preventDefault();
-        //If not liked -> add to user favorite DB
-        if (iconText === "Like") {
-            //Add to DB first
-            let updatedStatus = await requestAddFavorite();
-            setIcon(<MdOutlineFavorite/>);
-            setIconText("Unlike");
-            if (updatedStatus) {
-                props.user.favorite_map.set(props.data._id, props.data);
+        let userId = user.name;
+
+        try {
+            if (iconText === "Like") { //Adding favorite
+                let updateRequestStatus = await requestAddFavorite(userId, movieId);
+                if (updateRequestStatus) {
+                    console.log("Updating to unlike", props.data);
+                    setIcon(<MdOutlineFavorite/>);
+                    setIconText("Unlike");
+                    user.favorite_map.set(movieId, props.data);
+                    setFavoriteMapSize(user.favorite_map.size); // trigger re-render
+                }
+            } else {
+                let updateRequestStatus = await requestRemoveFavorite(userId, movieId);
+                if (updateRequestStatus) {
+                    console.log("Updating to like");
+                    setIcon(<MdFavoriteBorder/>);
+                    setIconText("Like");
+                    user.favorite_map.delete(movieId);
+                    setFavoriteMapSize(user.favorite_map.size); // trigger re-render
+                }
             }
-        } else {
-            //Remove from user favorite DB
-            let updatedStatus = await requestRemoveFavorite();
-            setIcon(<MdFavoriteBorder/>);
-            setIconText("Like");
-            if (updatedStatus) {
-                props.user.favorite_map.delete(props.data._id);
-            }
+        } catch (error) {
+            console.log(error);
+            // handle this error appropriately
         }
     }
 
