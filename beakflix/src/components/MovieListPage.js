@@ -24,6 +24,7 @@ function MovieListPage() {
     const [userCategory, setUserCategory] = useState(null);
     const {user} = useContext(UserContext);
     const {session} = useContext(SessionContext);
+    const [favoriteMapSize, setFavoriteMapSize] = useState(user.favorite_map.size);
 
     /*
         Response body example:
@@ -59,6 +60,8 @@ function MovieListPage() {
                 (<Category key={'userLikes'}
                            title="My likes"
                            genreList={genreList}
+                           favoriteMapSize={favoriteMapSize}
+                           setFavoriteMapSize={setFavoriteMapSize}
                 />));
         } else {
             setUserCategory(null);
@@ -72,6 +75,9 @@ function MovieListPage() {
             <Category
                 key={`genre-${index}`}
                 title={genre}
+                genreList={genreList}
+                favoriteMapSize={favoriteMapSize}
+                setFavoriteMapSize={setFavoriteMapSize}
             />
         ));
 

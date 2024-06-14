@@ -17,24 +17,26 @@ function Category(props) {
     //Stores React component into list for top 10 movies for normal case
     const [movieCardList, setMovieCardList] = useState([]);
     const [userMovieCardList, setUserMovieCardList] = useState([]);
-    const [favoriteMapSize, setFavoriteMapSize] = useState(user.favorite_map.size);
+
+    let favoriteMapSize = props.favoriteMapSize;
+    let setFavoriteMapSize = props.setFavoriteMapSize;
 
     //Update movie card components and html components once data is changed
     useEffect(() => {
-        const isUserCategoryCheck = user.favorite_map.size > 0;
+        const isUserCategoryCheck = user.favorite_map.size > 0 && props.title === "My likes" && session.login === true;
 
-        if (isUserCategory() === false) {
+        if (!isUserCategoryCheck) {
             setMoviesByGenreType().then(value => () => {
                 console.log("Genre " + props.title + " category initialized");
             });
         } else {
-            if (isUserCategoryCheck > 0) {
+            if (user.favorite_map.size > 0) {
                 setUserMovieCardComponent();
             } else {
                 setUserMovieCardList(null);
             }
         }
-    }, [favoriteMapSize, isUserCategory]);
+    }, [favoriteMapSize]);
 
     function isUserCategory() {
         return props.title === "My likes" && session.login === true;
