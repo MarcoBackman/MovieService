@@ -63,8 +63,38 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
 
 
 
-# How to setup and run (beakflix - frontend)
+# How to setup and run (baekflix - frontend)
 
-Will be added soon.
+1. Make sure you backend service is running with valid MongoDB connection
 
-Todo: add repository layer for baekflix application.
+2. Navigate to `\MovieService\baekflix\src\` and modify `config.json` for you local server connection.
+   For example, if you're running backend server in localhost:8085, you should put host as `localhost` and port as `8085`.
+   Additionally, if you have modified server http protocols to have ssl communication, then set `ssl` to `true` (by default, it is false).
+
+3. Make sure to change your proxy target if your server url and port is different. Go to `baekflix/package.json` and change `"proxy": "http://localhost:8085`
+
+4. At path `\MovieService\baekflix\` run following command.
+   `npm install` then `npm start`
+
+Then the open following url in your browser
+
+`http://localhost:8084/` 
+
+Then the following page will be shown
+>![Guest movie page](./img/baekflix-guest.png)
+
+User login/register to view more features
+>![Movie login page](./img/baekflix-login.png)
+
+User liked section will be shown based on your added favorites.
+>![Movie user page](./img/baekflix-userpage.png)
+
+Click show more to view details.
+>![Movie detail page](./img/baekflix-view-detail.png)
+
+## Things to improve in the future.
+- Make sure session works. (Session data has to be stored in database)
+- Have retry, circuit breaker mechanism.
+- Implement loading icon while contents are loading.
+- Email validation steps for register.
+- Oauth, 2FK for login.
