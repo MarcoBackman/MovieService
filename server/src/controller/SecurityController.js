@@ -41,9 +41,13 @@ router.post('/setCookie',
                     if (err) {
                         // handle error case
                         console.error("Error on destroying session:", err);
+                        res.status(500).send({ error: 'Could not destroy session.' });
+                        return; // prevents executing further code in case of an error
                     }
                     res.clearCookie(req.session.sessionData.id);
+                    res.status(200).send({ message: "Cookie Setup Success" });
                 });
+                res.status(200).send({ message: "Cookie Setup Success" });
             }
             res.status(200).send({ message: "Cookie Setup Success" });
         } catch (error) {

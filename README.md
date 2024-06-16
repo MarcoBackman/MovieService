@@ -101,3 +101,5 @@ Click show more to view details.
 - Implement loading icon while contents are loading.
 - Email validation steps for register.
 - Oauth, 2FK for login.
+
+- Migration/deployment can be done with docker.

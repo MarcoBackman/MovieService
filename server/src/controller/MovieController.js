@@ -17,12 +17,16 @@ router.get('/getMovieByID/:movie', async (req, res) => {
     logger.debug("movieObject: " + movieObject.movieID);
     logger.debug("request movie id: " + movieId);
 
-    let result = await MovieModel.findById(movieId);
-    logger.debug(result);
-    if (!result) {
-        res.json([]);
+    try {
+        let result = await MovieModel.findById(movieId);
+        if (!result) {
+            return res.json([]);
+        }
+        res.json(result);
+    } catch(error) {
+        console.error(`Database error: ${error}`);
+        res.status(500).send({ error: 'Something went wrong.' });
     }
-    res.json(result);
 });
 
 // example: http://{host}:{port}/movie/getGenreTypes
@@ -37,8 +41,6 @@ router.get('/getMoviesByGenre', async (req, res) => {
 
     let genre_query = { "genres": req.query.genre };
     let sortByRateDescending = { 'rating' : -1};
-
-    //Find genre value
 
     //Sort by rate first
     let result = await MovieModel.find(genre_query).sort(sortByRateDescending).limit(10);
