@@ -17,10 +17,13 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
     - fill in every credentials labeled with `{}` in the following json content.
     - when you have authentication setup for mongo db set `"hasAuth" : true` otherwise `"hasAuth" : true`.
     - When you have ssl configured for http communication, set `"cookie" : { "ssl" : false }` to `true`.
+    - If you need to make atlas db connection, set `isCloudDb` to `true` and put full url(including username, password, database) into `cloudDbFullUrl`
    ```json
    {
      "database": {
        "hasAuth" : false,
+       "isCloudDb" : false,
+       "cloudDbFullUrl" : "{YOUR_FULL_DB_URI}",
        "username" : "{YOUR_MONGODB_USERNAME}",
        "password" : "{YOUR_MONGODB_PW}",
        "host" : "{YOUR_MONGODB_HOST}",

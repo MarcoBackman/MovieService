@@ -103,9 +103,6 @@ router.post('/postSession', (req, res) => {
 
 //Setup session based on the cookie -> serverside only
 router.get('/getSession', (req, res) => {
-    console.log("Session info: ");
-    console.log(req.session.id);
-
     //Todo: fetch session data by sessionId from in memory storage
 
     if (!req.session.id) { // Check if session or session.id doesn't exist

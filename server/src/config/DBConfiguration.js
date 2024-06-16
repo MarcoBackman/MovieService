@@ -38,9 +38,9 @@ async function updateOrCreateGenreModel(genreName) {
     }
 }
 
-async function findMovieModel(singleMovie) {
+function findMovieModel(singleMovie) {
     //Find if data object exists
-    const res = await MovieModel.exists({
+    const res = MovieModel.exists({
         title: singleMovie.title,
         year: singleMovie.year,
     });
@@ -69,54 +69,30 @@ async function initializeMovieModel (singleMovie) {
 //iterate the local data and compare with db model data
 async function mongoDBConnectAndInit (data) {
     const isCloudDb = dbConfig.isCloudDb;
-    const cloudDbUri = dbConfig.cloudDbFullUrl;
-
-    //MongoDB cloud connection
-    if (isCloudDb === true) {
-        logger.info("Connecting cloud DB");
-
-        const client = new MongoClient(cloudDbUri, {
-            serverApi: {
-                version: ServerApiVersion.v1,
-                strict: true,
-                deprecationErrors: true,
-            }
-        });
-
-        async function connect() {
-            try {
-                // Connect the client to the server	(optional starting in v4.7)
-                await client.connect()
-                    .then(() => console.log('Connected to MongoDB...'))
-                    .catch(err => console.error('Could not connect to MongoDB... ', err));
-                await mongoose.connection.on('error', () => logger.error("Connection failed"));
-            } catch (err) {
-                console.log("server connection error");
-            } finally {
-                // Ensures that the client will close when you finish/error
-                await client.close();
-            }
-        }
-        await connect().catch(console.dir);
-    } else { //MongoDB non-cloud connection
+    let mongoDbUrlStr = ""
+    //Set full db url
+    if (isCloudDb) {
+        const cloudDbUri = dbConfig.cloudDbFullUrl;
+        const mongoDBUrl = new URL(cloudDbUri);
+        mongoDbUrlStr = mongoDBUrl.toString();
+    } else {
         const mongoDBUrlNoAuth = `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.dbname}`;
         const mongoDBUrl = new URL(`mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.dbname}`);
-        mongoDBUrl.username = '***';
-        mongoDBUrl.password = '***';
-        try {
-            let mongoDbUrlStr = dbConfig.hasAuth === false ? mongoDBUrlNoAuth.toString() : mongoDBUrl.toString();
-            logger.info("Connecting to mongoDB: " + mongoDbUrlStr);
-            await mongoose.connect(mongoDbUrlStr);
-            await mongoose.connection.on('error', () => logger.error("Connection failed"));
-        } catch (err) {
-            logger.error("Database connection error", err);
-            throw err;
-        }
+        mongoDbUrlStr = dbConfig.hasAuth === false ? mongoDBUrlNoAuth.toString() : mongoDBUrl.toString();
+    }
+
+    try {
+        logger.info("Connecting to mongoDB: " + mongoDbUrlStr);
+        await mongoose.connect(mongoDbUrlStr);
+        await mongoose.connection.on('error', () => logger.error("Connection failed"));
+    } catch (err) {
+        logger.error("Database connection error", err);
+        throw err;
     }
 
     logger.info("Initializing movie schema and data");
-    data.map(async (singleMovie) => {
-        await initializeMovieModel(singleMovie);
+    data.map((singleMovie) => {
+        initializeMovieModel(singleMovie);
     });
     logger.info("Initialization movie schema and data are done.");
 }
