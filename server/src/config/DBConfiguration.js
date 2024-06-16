@@ -112,11 +112,11 @@ async function mongoDBConnectAndInit (data) {
         }
     }
 
+    logger.info("Initializing movie schema and data");
     data.map(async (singleMovie) => {
-        logger.info("Initializing movie schema and data");
         await initializeMovieModel(singleMovie);
-        logger.info("Initialization movie schema and data are done.");
     });
+    logger.info("Initialization movie schema and data are done.");
 }
 
 async function synchronizeLocalFile() {
