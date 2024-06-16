@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 
 // Application Specific Imports
@@ -15,6 +15,10 @@ function LoginPage(props) {
     const [saveStatus, setSaveStatus] = useState("User Login");
     const {user, setUser} = useContext(UserContext);
     const {session, setSession} = useContext(SessionContext);
+
+    useEffect(() => {
+        alert("Account registration is currently blocked due to security reason.\n Only predefined id/pw are accepted");
+    }, []);
 
     async function getLoginsOnForm() {
         let id = document.querySelector("#id_input").value;
