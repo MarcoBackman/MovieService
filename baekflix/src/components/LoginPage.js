@@ -27,11 +27,14 @@ function LoginPage(props) {
     }
 
     async function handleSubmit(form) {
-        await login(form, setSession, setUser);
-        await fetchAndSetUserFavorite(form.id, setUser);
-
-        //Redirect to main
-        navigate("/home");
+        let loginSuccess = await login(form, setSession, setUser);
+        if (loginSuccess === false ) {
+            return false;
+        } else {
+            await fetchAndSetUserFavorite(form.id, setUser);
+            //Redirect to main
+            return true;
+        }
     }
 
     async function loginEvent(event) {
@@ -42,8 +45,11 @@ function LoginPage(props) {
         }
 
         let form = await getLoginsOnForm();
-        await handleSubmit(form);
-        setSaveStatus("User Login");
+        let loginSuccess = await handleSubmit(form);
+        if (loginSuccess === true) {
+            setSaveStatus("User Login");
+            navigate("/home");
+        }
     }
 
 

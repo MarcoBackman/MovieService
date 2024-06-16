@@ -21,9 +21,10 @@ async function getMovieByLiked (movieID) {
 //Must call this after session is retrieved
 export const fetchAndSetUserFavorite = async function (userID, setUser) {
     // Consider moving the axios.post call here, so it will only run when there's a successful login
-    const response = await axios.get(`/user/favorite/${userID}`);
-    console.log("fetch", response)
-    if (response.data) {
+    const response = await axios.get(`/user/favorite/${userID}`).catch((err) => {
+        console.info("Access denied. Need to login to fetch this");
+    });
+    if (response && response.data) {
         let map = new Map();
         for (const movieId of response.data) {
             let movieData = await getMovieByLiked(movieId);
@@ -38,9 +39,11 @@ export const fetchAndSetUserFavorite = async function (userID, setUser) {
 };
 
 export const login = async function(form, setSession, setUser) {
-    await axios.post('/user/login', form).then(resp => {
+    return await axios.post('/user/login', form)
+        .then(resp => {
         if (resp.data === false) {
             alert("Login failed wrong ID/PW");
+            return false;
         } else {
             //Send real session post to the server.
             //Username is equivalent to id here.
@@ -59,11 +62,13 @@ export const login = async function(form, setSession, setUser) {
             });
 
             alert("Logged in success");
+            return true;
         }
     }).catch(err => {
-            console.error(err);
-            alert("Failed request: Server Error");
-        });
+        console.error(err);
+        alert("Failed request: Server Error");
+        return false;
+    });
 }
 /**
  * Successful response example
