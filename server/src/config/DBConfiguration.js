@@ -86,16 +86,18 @@ async function mongoDBConnectAndInit (data) {
         async function connect() {
             try {
                 // Connect the client to the server	(optional starting in v4.7)
-                await client.connect();
-                // Send a ping to confirm a successful connection
-                await mongoose.connect(cloudDbUri);
+                await client.connect()
+                    .then(() => console.log('Connected to MongoDB...'))
+                    .catch(err => console.error('Could not connect to MongoDB... ', err));
                 await mongoose.connection.on('error', () => logger.error("Connection failed"));
+            } catch (err) {
+                console.log("server connection error");
             } finally {
                 // Ensures that the client will close when you finish/error
                 await client.close();
             }
         }
-        connect().catch(console.dir);
+        await connect().catch(console.dir);
     } else { //MongoDB non-cloud connection
         const mongoDBUrlNoAuth = `mongodb://${dbConfig.host}:${dbConfig.port}/${dbConfig.dbname}`;
         const mongoDBUrl = new URL(`mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.dbname}`);
