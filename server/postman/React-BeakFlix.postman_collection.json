@@ -47,6 +47,32 @@
 			"response": []
 		},
 		{
+			"name": "movie - get movie by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8085/movie/getMovieByID?movie=666375c7fd771e4ba7e41796",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"movie",
+						"getMovieByID"
+					],
+					"query": [
+						{
+							"key": "movie",
+							"value": "666375c7fd771e4ba7e41796"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "movie - get top 10 movies by genre",
 			"request": {
 				"method": "GET",
@@ -57,8 +83,17 @@
 		{
 			"name": "user - login",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "csrf-token",
+						"value": "",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"id\":\"test\",\r\n    \"pw\":\"1234\"\r\n}",
@@ -130,7 +165,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8085/user/favorite?id=test",
+					"raw": "http://localhost:8085/user/favorite/test",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -138,13 +173,8 @@
 					"port": "8085",
 					"path": [
 						"user",
-						"favorite"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "test"
-						}
+						"favorite",
+						"test"
 					]
 				}
 			},
@@ -218,7 +248,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"session\" : {\r\n        \"username\" : \"test\"\r\n    }\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -241,7 +271,7 @@
 			"response": []
 		},
 		{
-			"name": "security - get session logout",
+			"name": "security - session logout",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -356,6 +386,35 @@
 					"path": [
 						"security",
 						"deleteCookie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "security - set Session",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\" : \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8085/security/postSession",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"security",
+						"postSession"
 					]
 				}
 			},
