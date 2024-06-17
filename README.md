@@ -53,6 +53,7 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
 
 4. Run server with following command under `.\MovieService\server\`
    ``` 
+   npm install
    npm start node ./src/app.js
     ```
    ![server-command](./img/server.png)
