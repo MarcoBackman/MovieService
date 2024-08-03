@@ -9,9 +9,9 @@ let router = express.Router();
 
 // example: http://{host}:{port}/movie/getMovieByID/{id}
 //Accepts as path variable
-router.get('/getMovieByID/:movie', async (req, res) => {
+router.get('/getMovieByID/:movieId', async (req, res) => {
     const ObjectId = require('mongoose').Types.ObjectId;
-    let movieId = req.params.movie;
+    let movieId = req.params.movieId;
 
     const movieObject = {movieID: new ObjectId(movieId)};
     logger.debug("movieObject: " + movieObject.movieID);
