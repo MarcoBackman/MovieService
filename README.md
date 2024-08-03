@@ -71,8 +71,8 @@ A seperated repo from https://github.com/MarcoBackman/ReactProjects
 
 1. Make sure you backend service is running with valid MongoDB connection
 
-2. Navigate to `\MovieService\baekflix\src\` and modify `config.json` for you application port setup.
-   For example, if you're backend server in localhost:8085, and fi you want your application to be running on 8084, you should put host as `localhost` and port as `8084`.
+2. Navigate to `\MovieService\baekflix\src\` and modify `config.json` for your server setup.
+   For example, if you're backend server in localhost:8085, you should put host as `localhost` and port as `8085`.
    Additionally, if you have modified server http protocols to have ssl communication, then set `ssl` to `true` (by default, it is false).
 
 3. Make sure to change your proxy target if your server url and port is different. Go to `baekflix/package.json` and change `"proxy": "http://localhost:8085`
